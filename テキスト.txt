@@ -1,0 +1,67 @@
+<!-- ... existing code ... -->
+            <!-- 5. アクションボタン -->
+            <div class="pt-2 space-y-2.5">
+              <div class="grid grid-cols-2 gap-2.5">
+                <button onclick="openScreenshotModal()" class="py-3.5 px-3 rounded-xl bg-[#261B18] hover:bg-stone-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition">
+                  <span>📸 シェア用結果カード</span>
+                </button>
+                <button onclick="shareResult()" class="py-3.5 px-3 rounded-xl bg-[#C8102E] hover:bg-[#A30D25] text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition">
+                  <span>𝕏 結果をポスト</span>
+                </button>
+              </div>
+              <button onclick="copyShareUrl()" class="w-full py-3 px-3 rounded-xl bg-red-50 hover:bg-red-100/80 text-[#C8102E] border border-red-200 font-bold text-xs flex items-center justify-center gap-1.5 transition">
+                <span>🔗 この結果のリンクをコピー（LINE・DM用）</span>
+              </button>
+              <div class="grid grid-cols-2 gap-2.5">
+                <button onclick="startQuiz()" class="py-2.5 px-3 rounded-xl bg-stone-100 hover:bg-stone-200/70 text-[#261B18] font-bold text-xs transition">
+                  もう一度診断する
+                </button>
+                <button onclick="openEncyclopediaModal()" class="py-2.5 px-3 rounded-xl bg-stone-100 hover:bg-stone-200/70 text-[#261B18] font-bold text-xs transition">
+                  全32タイプ図鑑へ
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+<!-- ... existing code ... -->
+    function shareResult() {
+      const item = TYPES_32[state.resultCode];
+      const pageUrl = getShareableUrl(item.code);
+      const shareText = `ゴンチャ32タイプ診断の結果は【${item.code}：${item.persona}】でした！\nおすすめの一杯：${item.drinkName}\n注文カスタム：${item.custom}\n#ゴンチャ32タイプ診断 #Gongcha\n${pageUrl}`;
+      const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
+      window.open(shareUrl, '_blank', 'noopener,noreferrer');
+    }
+
+    function getShareableUrl(code) {
+      const base = window.location.href.split('?')[0].split('#')[0];
+      if (base.startsWith('http://') || base.startsWith('https://')) {
+        return `${base}?type=${code}`;
+      }
+      return '';
+    }
+
+    function copyShareUrl() {
+      const url = getShareableUrl(state.resultCode);
+      if (!url) {
+        showToast('公開URL発行後に結果リンクをコピーできます');
+        return;
+      }
+      copyCustomText(url);
+      showToast('この診断結果のリンクをコピーしました！');
+    }
+<!-- ... existing code ... -->
+    // URLパラメータ（?type=MFDNA など）があれば該当結果から起動
+    const initialParams = new URLSearchParams(window.location.search);
+    const paramType = (initialParams.get('type') || '').toUpperCase();
+    if (TYPES_32[paramType]) {
+      state.resultCode = paramType;
+      state.screen = 'result';
+    }
+
+    // 初期描画
+    render();
+  </script>
+</body>
+</html>
